@@ -1,0 +1,60 @@
+version: "3.3"
+services:
+  product:
+    image: product
+    hostname: product
+    networks:
+      privateNetwork:
+        ipv4_address: 172.20.199.2
+    environment:
+      ACTIVEMQ_URL: tcp://172.20.199.6:61616
+      ACTIVEMQ_USER: admin
+      ACTIVEMQ_PWD: admin
+      EUREKA_SERVICE_URL: http://172.20.199.5:9000/eureka
+    restart: always
+  cart:
+    image: cart
+    hostname: cart
+    networks:
+      privateNetwork:
+        ipv4_address: 172.20.199.3
+    environment:
+      ACTIVEMQ_URL: tcp://172.20.199.6:61616
+      ACTIVEMQ_USER: admin
+      ACTIVEMQ_PWD: admin
+      EUREKA_SERVICE_URL: http://172.20.199.5:9000/eureka
+    restart: always
+  apigateway:
+    image: apigateway
+    hostname: apigateway
+    restart: always
+    networks:
+      privateNetwork:
+        ipv4_address: 172.20.199.4
+    environment:
+      EUREKA_SERVICE_URL: http://172.20.199.5:9000/eureka
+    ports:
+      - "8080:8080"
+  eureka:
+    image: eureka
+    hostname: eureka
+    networks:
+      privateNetwork:
+        ipv4_address: 172.20.199.5
+    environment:
+      EUREKA_SERVICE_URL: http://172.20.199.5:9000/eureka
+      APP_PORT: 9000
+    ports:
+      - "9000:9000"
+  activemq:
+    image: activemq
+    hostname: activemq
+    networks:
+      privateNetwork:
+        ipv4_address: 172.20.199.6
+networks:
+  privateNetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.199.1/24
